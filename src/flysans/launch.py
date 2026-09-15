@@ -79,7 +79,7 @@ def main():
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765, help="preferred port; the next free port is used automatically")
     parser.add_argument("--no-browser", action="store_true")
-    parser.add_argument("--no-download", action="store_true", help="fail instead of downloading a missing checkpoint")
+    parser.add_argument("--no-download", action="store_true", help="fail instead of downloading missing data or weights")
     args = parser.parse_args()
 
     root = Path.cwd()
