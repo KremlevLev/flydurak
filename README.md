@@ -6,6 +6,8 @@ A published **MaleCNS fruit-fly connectome** turned into a recurrent policy for 
 
 > Fun research demo, not evidence that a fly brain understands cards or that biological topology beats conventional neural networks.
 
+![FlyDurak gameplay: cards and MaleCNS neural activity](docs/assets/flydurak-demo.gif)
+
 ## Run it
 
 Python 3.11+ is the only prerequisite. From the repository directory:
