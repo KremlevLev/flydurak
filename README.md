@@ -2,164 +2,51 @@
 
 **English** | [Русский](README.ru.md)
 
-## Quick play
+A published **MaleCNS fruit-fly connectome** turned into a recurrent policy for two-player Durak. The playable model uses **165,122 neurons and 10,511,038 directed edges** and shows its strongest neural signals while choosing a card.
 
-After installation, start the browser game with one command:
+> Fun research demo, not evidence that a fly brain understands cards or that biological topology beats conventional neural networks.
 
-```bash
-flydurak
-```
+## Run it
 
-The launcher automatically selects CUDA when available (otherwise CPU), downloads the release checkpoint when it is missing, finds the graph, chooses a free port starting at `8765`, and opens the browser.
-
-An experimental reinforcement-learning project that turns the published **MaleCNS fruit-fly connectome** into a recurrent policy for two-player podkidnoy Durak.
-
-The controller uses the complete processed graph used in our experiments: **165,122 neurons and 10,511,038 directed edges** after retaining traced neurons and connections with at least three synapses. The graph runs as a sparse recurrent network. A compact decision GRU, legal-action masking, actor/critic heads, and bounded factorized synaptic plasticity make the biological topology usable for the card task.
-
-> This is a pet/research project, not evidence that a biological connectome is better than standard neural networks. The current agent is entertaining and can beat humans, but the controlled multi-seed baseline study is unfinished.
-
-## What is included
-
-- Complete headless two-player 36-card Durak environment.
-- MaleCNS downloader and graph preprocessing.
-- Sparse connectome, deep hybrid, GRU, LSTM, RNN, and MLP policies.
-- Search, scripted, mixed, and frozen-policy opponents.
-- Factorized plasticity affecting every retained connectome edge.
-- CLI and browser interface for playing against a checkpoint.
-- Topology controls and an experimental study runner.
-- Deterministic smoke tests.
-
-No dataset, checkpoint, Steam installation, or proprietary game asset is committed.
-
-## Install
-
-Python 3.11+ and a CUDA-enabled PyTorch installation are recommended for the full connectome.
+Python 3.11+ is the only prerequisite. From the repository directory:
 
 ```bash
-git clone <your-repository-url>
-cd drosophila-git
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install --upgrade pip
-python3 -m pip install -e '.[dev]'
-python3 -m pytest -q tests
+python run.py
 ```
 
-On Windows, activate with `.venv\Scripts\activate`.
+On Windows, `py run.py` works too. The first run creates `.venv`, installs the project, downloads and builds MaleCNS, downloads and verifies the 374 MiB checkpoint, selects CUDA or CPU, finds a free port, and opens the game. Later runs start directly.
 
-## Prepare MaleCNS on the training machine
-
-The command downloads the public flat-connectome Feather tables and builds the sparse graph locally:
+Clone and run in one line:
 
 ```bash
-flysans-prepare all \
-  --raw data/raw/malecns-v1.0 \
-  --output data/processed/malecns-v1.0.pt \
-  --minimum-weight 3
+git clone https://github.com/KremlevLev/flydurak.git && cd flydurak && python3 run.py
 ```
 
-Expected output for this configuration:
-
-```text
-neurons: 165122
-edges:   10511038
-```
-
-The processed graph is approximately 202 MB and is intentionally ignored by Git.
-
-## Train the release configuration
-
-The strongest current public configuration uses the deep hybrid controller, factorized plasticity, and a determinized search opponent. Start conservatively and adjust the batch size for the machine.
+### Docker
 
 ```bash
-flydurak-train \
-  --device cuda \
-  --model connectome \
-  --architecture deep \
-  --plastic-edges \
-  --edge-learning-rate 0.0001 \
-  --plasticity-weight 0.0001 \
-  --graph data/processed/malecns-v1.0.pt \
-  --opponent search \
-  --search-rollouts 32 \
-  --search-fraction 0.5 \
-  --updates 120 \
-  --batch-size 256 \
-  --decisions 128 \
-  --learning-rate 0.00001 \
-  --entropy-weight 0.01 \
-  --eval-games 1024 \
-  --output runs/flydurak.pt
+docker compose up --build
 ```
 
-The trainer writes `runs/flydurak.pt` and selects `runs/flydurak.best.pt` using the rolling win rate against the training opponent.
+Then open [http://localhost:8765](http://localhost:8765). Data and weights are cached in `data/` and `models/`.
 
-The optional hard-label search teacher is experimental and disabled by default. Our first `--teacher-weight 0.1` run reduced playing strength; see [Experiments](docs/EXPERIMENTS.md).
+## What was trained
 
-## Play in a browser
+MaleCNS is converted to a signed, normalized sparse recurrent graph. The agent combines connectome state with a compact decision GRU, legal-action masking, actor/critic heads, and factorized source/target synaptic gains. It was trained with batched reinforcement learning against random, scripted, frozen-policy, and determinized-search opponents, followed by search-focused fine-tuning.
 
-Place the processed graph and a compatible checkpoint on the machine, then run:
+The browser uses official MaleCNS soma coordinates and visualizes strong hidden-state activations and directed synaptic signals. The full graph runs at inference; only a readable subset of signals is drawn.
 
-To add the official MaleCNS soma coordinates to an existing processed graph
-without rebuilding its edges:
+The checkpoint is an exploratory demo: it can beat humans, but it is not a solved-game agent. A controlled multi-seed comparison with GRU/LSTM baselines remains unfinished.
+
+## Options
 
 ```bash
-flysans-prepare positions \
-  --raw data/raw/malecns-v1.0 \
-  --graph data/processed/malecns-v1.0.pt \
-  --output data/processed/malecns-v1.0-soma.pt
+python run.py --device cpu
+python run.py --device cuda
+python run.py --port 9000
+python run.py --no-browser
 ```
 
-The raw directory only needs the small official
-`body-annotations-male-cns-v1.0-minconf-0.5.feather` file for this command.
+More: [architecture](docs/ARCHITECTURE.md), [experiments](docs/EXPERIMENTS.md), [model card](docs/MODEL_CARD.md), [data](data/README.md).
 
-```bash
-flydurak-web \
-  --device cuda \
-  --graph data/processed/malecns-v1.0-soma.pt \
-  --checkpoint models/durak-fast-plastic-r32.best.pt \
-  --host 0.0.0.0 \
-  --port 8765
-```
-
-Open `http://SERVER_IP:8765/`. Only expose the port where your network policy permits it; the demo has no authentication and is intended for a trusted network.
-
-The browser UI groups the hand by suit, sorts each suit from 6 through ace, and
-keeps the trump group at the far right. After every fly move it also displays
-the strongest hidden-state activations and the policy's leading legal choices.
-The CNS shape is a deterministic functional projection: neuron IDs and values
-come from the model, but the checkpoint does not contain anatomical XYZ
-coordinates, so the displayed positions are not anatomical locations.
-
-For a terminal game:
-
-```bash
-flydurak-play \
-  --device cuda \
-  --graph data/processed/malecns-v1.0.pt \
-  --checkpoint models/durak-fast-plastic-r32.best.pt
-```
-
-## Repository map
-
-```text
-src/flysans/durak.py              game rules and opponents
-src/flysans/durak_train.py        actor/critic training loop
-src/flysans/model.py              sparse connectome and baselines
-src/flysans/prepare.py            MaleCNS download and preprocessing
-src/flysans/durak_web.py          FastAPI browser game
-src/flysans/study.py              comparative experiment runner
-src/flysans/topology_controls.py  graph null controls
-tests/                             smoke and invariant tests
-docs/                              architecture, results, model card
-```
-
-## Reproducibility and claims
-
-Current numbers are exploratory single-run measurements. They are useful for choosing a demo checkpoint but not for claiming superiority of biological topology. A defensible comparison requires multiple seeds, matched baselines, held-out opponents, topology rewires, and confidence intervals.
-
-See [Architecture](docs/ARCHITECTURE.md), [Experiments](docs/EXPERIMENTS.md), [Model card](docs/MODEL_CARD.md), and [Data provenance](data/README.md).
-
-## License
-
-Project code is available under the [MIT License](LICENSE). MaleCNS data is not redistributed here and retains its own attribution and license requirements.
+Code: [MIT](LICENSE). MaleCNS is downloaded from its original public source and retains its own attribution and license requirements.

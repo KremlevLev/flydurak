@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+data/raw
+data/processed
+runs
+outputs
+models/*.pt

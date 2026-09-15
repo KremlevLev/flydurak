@@ -61,6 +61,15 @@ def _download_checkpoint(root):
         raise
     return target
 
+def _prepare_graph(root):
+    from .prepare import build, download
+    raw = root / "data/raw/malecns-v1.0"
+    target = root / "data/processed/malecns-v1.0-soma.pt"
+    print("MaleCNS graph is missing; downloading and building it once...", flush=True)
+    download(raw)
+    build(raw, target, minimum_weight=3)
+    return target
+
 
 def main():
     parser = argparse.ArgumentParser(description="Start the FlyDurak browser game")
@@ -85,7 +94,9 @@ def main():
         root / "runs/durak-league-2.best.pt",
     ))
     if graph is None:
-        parser.error("MaleCNS graph not found under data/processed; see README.ru.md")
+        if args.no_download:
+            parser.error("MaleCNS graph not found under data/processed")
+        graph = _prepare_graph(root)
     if checkpoint is None:
         if args.no_download:
             parser.error("checkpoint not found under models/ or runs/")

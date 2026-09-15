@@ -7,7 +7,7 @@ name = "flysans"
 version = "0.1.0"
 description = "A MaleCNS connectome-constrained recurrent policy for two-player Durak"
 requires-python = ">=3.11"
-dependencies = ["numpy>=2", "torch>=2.2", "fastapi>=0.115", "uvicorn>=0.30"]
+dependencies = ["numpy>=2", "torch>=2.2", "pyarrow>=18", "fastapi>=0.115", "uvicorn>=0.30"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyarrow>=18"]
