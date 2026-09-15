@@ -16,7 +16,13 @@ python run.py
 
 On Windows, `py run.py` works too. The first run creates `.venv`, installs the project, downloads and builds MaleCNS, downloads and verifies the 374 MiB checkpoint, selects CUDA or CPU, finds a free port, and opens the game. Later runs start directly.
 
-Clone and run in one line:
+Clone and run in one line on Windows PowerShell (including PowerShell 5):
+
+```powershell
+git clone https://github.com/KremlevLev/flydurak.git; Set-Location flydurak; py run.py
+```
+
+On Linux or macOS:
 
 ```bash
 git clone https://github.com/KremlevLev/flydurak.git && cd flydurak && python3 run.py

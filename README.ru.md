@@ -16,11 +16,13 @@ py run.py
 
 На Linux и macOS: `python3 run.py`. Первый запуск сам создаст `.venv`, установит проект, скачает и соберёт MaleCNS, скачает и проверит checkpoint размером 374 МБ, выберет CUDA или CPU, найдёт свободный порт и откроет игру. Следующие запуски будут быстрыми.
 
-Скачать репозиторий и запустить одной строкой:
+Скачать репозиторий и запустить одной строкой в Windows PowerShell 5/7:
 
 ```powershell
-git clone https://github.com/KremlevLev/flydurak.git; cd flydurak; py run.py
+git clone https://github.com/KremlevLev/flydurak.git; Set-Location flydurak; py run.py
 ```
+
+URL нужно копировать как обычный текст, без Markdown-скобок `[...](...)`.
 
 ### Docker
 
