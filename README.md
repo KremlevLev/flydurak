@@ -21,10 +21,7 @@ Clone and run in one line on Windows PowerShell (including PowerShell 5):
 ```powershell
 git clone https://github.com/KremlevLev/flydurak.git; Set-Location flydurak; py run.py
 ```
-or
-```powershell
-git clone https://github.com/KremlevLev/flydurak.git; Set-Location flydurak; py run.py
-```
+
 On Linux or macOS:
 
 ```bash
