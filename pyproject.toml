@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flysans"
+version = "0.1.0"
+description = "A MaleCNS connectome-constrained recurrent policy for two-player Durak"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2", "torch>=2.2", "fastapi>=0.115", "uvicorn>=0.30"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pyarrow>=18"]
+
+[project.scripts]
+flydurak = "flysans.launch:main"
+flysans-train = "flysans.train:main"
+flysans-prepare = "flysans.prepare:main"
+flysans-benchmark = "flysans.benchmark:main"
+flydurak-train = "flysans.durak_train:main"
+flydurak-distill = "flysans.durak_distill:main"
+flydurak-topology = "flysans.topology_controls:main"
+flydurak-study = "flysans.study:main"
+flydurak-analyze = "flysans.study_analyze:main"
+flydurak-play = "flysans.durak_play:main"
+flydurak-web = "flysans.durak_web:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
